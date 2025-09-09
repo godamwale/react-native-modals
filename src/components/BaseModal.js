@@ -102,13 +102,14 @@ class BaseModal extends Component<ModalProps, State> {
       }),
       modalState: MODAL_CLOSED,
     };
+    this.backHandlerSubscription = null;
   }
 
   componentDidMount() {
     if (this.props.visible) {
       this.show();
     }
-    BackHandler.addEventListener(HARDWARE_BACK_PRESS_EVENT, this.onHardwareBackPress);
+    this.backHandlerSubscription = BackHandler.addEventListener(HARDWARE_BACK_PRESS_EVENT, this.onHardwareBackPress);
   }
 
   componentDidUpdate(prevProps: ModalProps) {
@@ -122,7 +123,9 @@ class BaseModal extends Component<ModalProps, State> {
   }
 
   componentWillUnmount() {
-    BackHandler.removeEventListener(HARDWARE_BACK_PRESS_EVENT, this.onHardwareBackPress);
+    if (this.backHandlerSubscription) {
+      this.backHandlerSubscription.remove();
+    }
   }
 
   onHardwareBackPress = (): boolean => this.props.onHardwareBackPress();
